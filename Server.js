@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 
-const app = express();  // <-- VERY IMPORTANT
+const app = express();
 app.use(express.json());
 app.use(cors());
 
@@ -18,6 +18,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/genwave_db")
 // CONTACT SCHEMA
 const contactSchema = new mongoose.Schema({
     name: String,
+    roll: String,        // <-- Added Roll Number
     email: String,
     message: String,
     date: { type: Date, default: Date.now }
@@ -29,9 +30,15 @@ const Contact = mongoose.model("Contact", contactSchema);
 // POST API — STORE CONTACT MESSAGE
 app.post("/api/contact", async (req, res) => {
     try {
-        const { name, email, message } = req.body;
+        const { name, rollNumber, email, message } = req.body;  // <-- Added rollNumber
 
-        const newMessage = new Contact({ name, email, message });
+        const newMessage = new Contact({
+            name,
+            roll,   // <-- Store Roll Number
+            email,
+            message
+        });
+
         await newMessage.save();
 
         res.json({ success: true, message: "Message stored successfully!" });
@@ -41,6 +48,7 @@ app.post("/api/contact", async (req, res) => {
         res.json({ success: false, message: "Failed to store message." });
     }
 });
+
 
 // GET API — FETCH ALL CONTACT MESSAGES
 app.get("/api/contact/messages", async (req, res) => {
